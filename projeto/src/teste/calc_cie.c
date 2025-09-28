@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 
-float calcular(float a, float b, char si){
+float calcular(char si, float a, float b) {
     float res_aux = 1;
     
     if(si == '+') {
@@ -50,51 +50,33 @@ float calcular(float a, float b, char si){
 }
 
 void calculadora_cientifica() {
-    float res, n1, n2=0;
+    float res, n1, n2 = 0;
     char op;
 
-    printf("operadores suportados: +(soma), -(subtração), /(divisão), *(multplicação), ^(exponencial), r(raiz quadrada), |(modulo), !(fatorial), l(logaritmo)\n");
+    printf("\n=== CALCULADORA CIENTIFICA ===\n");
+    printf("operadores suportados: +(soma), -(subtracao), /(divisao), *(multiplicacao), ^(exponencial), r(raiz quadrada), |(modulo), !(fatorial), l(logaritmo)\n");
     printf("como usar: digite o primeiro numero, a operacao e o segundo numero, apos isso, caso queira o resultado, digite o simbolo de '=', caso queira calcular em cima do resultado da operacao realizada, digite novamente mais um operador seguido de mais um numero\n");
-    printf("caso queira utilizar um numero irracional (pi ou euler), ao inves de digitar um operador, digite 'p' para pi ou 'e' para euler, e depois digite a operação juntamente com o segundo numero (caso seja uma operação que necessite) novamente \n\n");
+    printf("caso queira utilizar um numero irracional (pi ou euler), ao inves de digitar um operador, digite 'p' para pi ou 'e' para euler, e depois digite a operacao juntamente com o segundo numero (caso seja uma operacao que necessite) novamente \n\n");
 
     scanf("%f", &n1);
     scanf(" %c", &op);
-    res=n1;
+    res = n1;
 
-    while (op!='='){
-        if(op=='p'){
-            res=3.141592;
+    while (op != '=') {
+        if(op == 'p') {
+            res = 3.141592;
             scanf(" %c", &op);
-        } else if(op=='e'){
-            res=2.718281;
+        } else if(op == 'e') {
+            res = 2.718281;
             scanf(" %c", &op);
         }
-        if((op!='r')&&(op!='|')&&(op!='!')&&(op!='l')){
+        if((op != 'r') && (op != '|') && (op != '!') && (op != 'l')) {
             scanf("%f", &n2);            
         }
-        res=calcular(op, res, n2);
-        scanf(" %c", &op);
+        if(op != '=') {
+            res = calcular(op, res, n2);
+            scanf(" %c", &op);
+        }
     }
     printf("\nresultado da operacao: %f\n", res);
-}
-
-void conversor_de_unidades(){
-
-}
-
-
-int main() {
-    char sel;
-
-    printf("ola, esta eh a sua calculadora multi funcao\n");
-    printf("selecione a opcao de calculadora que voce deseja:\n C - (calculadora cientifica)\n U - (conversor de unidades)\n M - (calculadora de matrizes)\n");
-    scanf(" %c", &sel);
-    if(sel=='C' || sel=='c'){
-        calculadora_cientifica();
-    } else if(sel=='U' || sel=='u'){
-        conversor_de_unidades();
-    }
-
-
-    return 0;
 }
