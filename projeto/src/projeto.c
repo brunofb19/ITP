@@ -1,5 +1,19 @@
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
+
+#define MAX_HIST 100
+#define TAM_EXP 200
+
+
+typedef struct {
+    char exp[TAM_EXP];
+    float res;
+} CalcHist;
+
+CalcHist hist[MAX_HIST];
+int tot_calc = 0;
+int idx_hist = 0;
 
 float calcular(char si, float a, float b);
 void calculadora_cientifica();
@@ -12,6 +26,42 @@ void conversor_volume();
 void conversor_massa();
 void conversor_velocidade();
 
+void add_hist(const char* exp, float res) {
+    if (tot_calc < MAX_HIST) {
+        strncpy(hist[tot_calc].exp, exp, TAM_EXP - 1);
+        hist[tot_calc].exp[TAM_EXP - 1] = '\0';
+        hist[tot_calc].res = res;
+        tot_calc++;
+    } else {
+        strncpy(hist[idx_hist].exp, exp, TAM_EXP - 1);
+        hist[idx_hist].exp[TAM_EXP - 1] = '\0';
+        hist[idx_hist].res = res;
+        idx_hist = (idx_hist + 1) % MAX_HIST;
+    }
+}
+
+void mostrar_hist() {
+    printf("\n=== HISTORICO DE CALCULOS ===\n");
+    if (tot_calc == 0) {
+        printf("Nenhum calculo no historico.\n");
+        return;
+    }
+    
+    int mostrar = (tot_calc < MAX_HIST) ? tot_calc : MAX_HIST;
+    int start = (tot_calc < MAX_HIST) ? 0 : idx_hist;
+    
+    for (int i = 0; i < mostrar; i++) {
+        int pos = (start + i) % MAX_HIST;
+        printf("%d: %s = %.6f\n", i + 1, hist[pos].exp, hist[pos].res);
+    }
+    printf("Total de calculos: %d\n", tot_calc);
+}
+
+void limpar_hist() {
+    tot_calc = 0;
+    idx_hist = 0;
+    printf("Historico limpo!\n");
+}
 
 float calcular(char si, float a, float b){
     float res_aux = 1;
@@ -64,9 +114,12 @@ float calcular(char si, float a, float b){
 void calculadora_cientifica() {
     float res, n1, n2=0;
     char op;
+    char exp[TAM_EXP] = "";
+    char temp[50];
 
     printf("\n=== CALCULADORA CIENTIFICA ===\n");
     printf("operadores suportados: +(soma), -(subtração), /(divisão), *(multplicação), ^(exponencial), r(raiz quadrada), |(modulo), !(fatorial), l(logaritmo)\n");
+    printf("comandos especiais: h (historico), c (limpar historico), = (calcular e sair)\n");
     printf("como usar: digite o primeiro numero, a operacao e o segundo numero, apos isso, caso queira o resultado, digite o simbolo de '=', caso queira calcular em cima do resultado da operacao realizada, digite novamente mais um operador seguido de mais um numero\n");
     printf("caso queira utilizar um numero irracional (pi ou euler), ao inves de digitar um operador, digite 'p' para pi ou 'e' para euler, e depois digite a operação juntamente com o segundo numero (caso seja uma operação que necessite) novamente \n\n");
 
@@ -75,22 +128,56 @@ void calculadora_cientifica() {
     res=n1;
 
     while (op!='='){
-        if(op=='p'){
+        if(op == 'h' || op == 'H') {
+            mostrar_hist();
+            printf("\nDigite a proxima operacao (ou = para sair): ");
+            scanf(" %c", &op);
+            continue;
+        } else if(op == 'c' || op == 'C') {
+            limpar_hist();
+            printf("\nDigite a proxima operacao (ou = para sair): ");
+            scanf(" %c", &op);
+            continue;
+        } else if(op=='p'){
             res=3.141592;
+            strcpy(exp, "π");
             scanf(" %c", &op);
         } else if(op=='e'){
             res=2.718281;
+            strcpy(exp, "e");
             scanf(" %c", &op);
         }
-        if((op!='r')&&(op!='|')&&(op!='!')&&(op!='l')){
+        if((op!='r')&&(op!='|')&&(op!='!')&&(op!='l')&&(op!='=')){
             scanf("%f", &n2);            
         }
         if(op!='='){
+            float temp_res = res;
             res=calcular(op, res, n2);
+
+            if(op == 'r') {
+                sprintf(temp, " sqrt(%.6f)", temp_res);
+            } else if(op == '|') {
+                sprintf(temp, " |%.6f|", temp_res);
+            } else if(op == '!') {
+                sprintf(temp, " %.6f!", temp_res);
+            } else if(op == 'l') {
+                sprintf(temp, " log10(%.6f)", temp_res);
+            } else {
+                sprintf(temp, " %c %.6f", op, n2);
+            }
+            strcat(exp, temp);
+
             scanf(" %c", &op);
         }
     }
     printf("\nresultado da operacao: %f\n", res);
+    add_hist(exp, res);
+    printf("\nDeseja ver o historico? (s/n): ");
+    char ver_hist;
+    scanf(" %c", &ver_hist);
+    if(ver_hist == 's' || ver_hist == 'S') {
+        mostrar_hist();
+    }
 }
 
 void conversor_de_unidades(){
