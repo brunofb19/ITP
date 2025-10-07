@@ -1,0 +1,17 @@
+/*Problema 1 - Calculadora de IMC
+Crie um programa que leia o peso (em kg) e a altura (em metros) de uma pessoa e calcule seu Índice de
+Massa Corporal (IMC). O programa deve declarar todas as variáveis com tipos apropriados (float) e exibir o
+resultado com 2 casas decimais.
+Fórmula: IMC = peso / (altura²)
+*/
+
+#include <stdio.h>
+
+int main() {
+    float peso, altura, imc;
+    scanf("%f", &peso);
+    scanf("%f", &altura);
+    imc = peso / (altura * altura);
+    printf("%.2f\n", imc);
+    return 0;
+}

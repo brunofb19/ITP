@@ -1,0 +1,22 @@
+/*
+Problema 3 - Cálculo de juros compostos
+Escreva um programa que leia o capital inicial, a taxa de juros (em porcentagem) e o tempo (em anos).
+Calcule e exiba o montante final usando a fórmula de juros compostos. Declare as variáveis com tipos
+apropriados.
+Fórmula: Montante = Capital × (1 + taxa/100)^tempo
+Dica: Use a função pow() da biblioteca math.h
+*/
+
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    float cap, taxa, mont;
+    int temp;
+    scanf("%f", &cap);
+    scanf("%f", &taxa);
+    scanf("%d", &temp);
+    mont = cap * pow(1 + taxa/100, temp);
+    printf("%.2f\n", mont);
+    return 0;
+}

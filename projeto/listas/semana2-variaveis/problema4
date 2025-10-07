@@ -1,0 +1,25 @@
+/*
+Problema 4 - Operações aritméticas básicas
+Crie um programa que leia dois números inteiros e exiba:
+A soma dos números
+A diferença (primeiro menos segundo)
+O produto
+A divisão real (resultado em float)
+O resto da divisão inteira
+A média aritmética
+*/
+
+#include <stdio.h>
+
+int main() {
+    int a, b;
+    scanf("%d", &a);
+    scanf("%d", &b);
+    printf("%d\n", a + b);
+    printf("%d\n", a - b);
+    printf("%d\n", a * b);
+    printf("%.2f\n", (float)a / b);
+    printf("%d\n", a % b);
+    printf("%.2f\n", (a + b) / 2.0);
+    return 0;
+}

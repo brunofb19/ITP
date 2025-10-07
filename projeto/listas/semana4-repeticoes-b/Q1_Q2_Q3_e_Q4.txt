@@ -1,0 +1,19 @@
+Q1- 
+0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3
+
+Q2-
+Uma escada começando do um até o n, criando uma linha a mais que repete o mesmo valor dos demais termos da mesma coluna, e adicionando uma coluna nova que possui o valor de 1+ o valor da ultima coluna da linha anterior, ex para n=3:
+1
+1 2
+1 2 3
+
+Q3-
+mesma coisa da questão 2, mas invertido, dessa vez ele mantem o valor para novas colunas, e realiza as operações para as novas colunas, exemplo para n=3:
+1
+2 1
+3 2 1
+
+Q4-
+Imprimi uma matriz de tamanho NxN onde o primeiro termo é N e segue na mesma linha com todos os outros termos sendo o valor do termo anterior mais um, a mesma coisa para as colunas, exemplo para N=2:
+2 3
+3 4
