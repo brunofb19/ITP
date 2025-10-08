@@ -67,3 +67,5 @@ Requisitos
 Compilador C (gcc ou compatível).
 
 Sistema operacional Linux, MacOS ou Windows.
+
+link para o repositório: https://github.com/brunofb19/bruno_ferreira-itp-2025-2.git
