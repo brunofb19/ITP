@@ -25,6 +25,10 @@ void conversor_area();
 void conversor_volume();
 void conversor_massa();
 void conversor_velocidade();
+void mostrar_menu_calculadora();
+void processar_numero_especial(char op, float *res, char *exp);
+void processar_operacao_unaria(char op, float res, char *exp, char *temp);
+void processar_operacao_binaria(char op, float res, float n2, char *exp, char *temp);
 
 void add_hist(const char* exp, float res) {
     if (tot_calc < MAX_HIST) {
@@ -111,23 +115,62 @@ float calcular(char si, float a, float b){
     return res_aux;
 }
 
+void mostrar_menu_calculadora() {
+    printf("\n=== CALCULADORA CIENTIFICA ===\n");
+    printf("Operadores suportados:\n");
+    printf("  + (soma)        - (subtracao)   / (divisao)\n");
+    printf("  * (multiplicacao) ^ (exponencial) r (raiz quadrada)\n");
+    printf("  | (modulo)      ! (fatorial)    l (logaritmo base 10)\n");
+    printf("\nComandos especiais:\n");
+    printf("  h - historico   c - limpar historico   = - calcular e sair\n");
+    printf("  p - usar pi     e - usar numero de Euler\n");
+    printf("\nComo usar:\n");
+    printf("  Digite: numero operador numero\n");
+    printf("  Exemplo: 5 + 3 * 2 =\n");
+    printf("  Ou use: p * 2 (para calcular 2 * pi)\n\n");
+}
+
+void processar_numero_especial(char op, float *res, char *exp) {
+    if(op == 'p') {
+        *res = 3.141592;
+        strcpy(exp, "π");
+    } else if(op == 'e') {
+        *res = 2.718281;
+        strcpy(exp, "e");
+    }
+}
+
+void processar_operacao_unaria(char op, float res, char *exp, char *temp) {
+    if(op == 'r') {
+        sprintf(temp, " sqrt(%.6f)", res);
+    } else if(op == '|') {
+        sprintf(temp, " |%.6f|", res);
+    } else if(op == '!') {
+        sprintf(temp, " %.6f!", res);
+    } else if(op == 'l') {
+        sprintf(temp, " log10(%.6f)", res);
+    }
+}
+
+void processar_operacao_binaria(char op, float res, float n2, char *exp, char *temp) {
+    sprintf(temp, " %c %.6f", op, n2);
+}
+
 void calculadora_cientifica() {
     float res, n1, n2=0;
     char op;
     char exp[TAM_EXP] = "";
     char temp[50];
 
-    printf("\n=== CALCULADORA CIENTIFICA ===\n");
-    printf("operadores suportados: +(soma), -(subtração), /(divisão), *(multplicação), ^(exponencial), r(raiz quadrada), |(modulo), !(fatorial), l(logaritmo)\n");
-    printf("comandos especiais: h (historico), c (limpar historico), = (calcular e sair)\n");
-    printf("como usar: digite o primeiro numero, a operacao e o segundo numero, apos isso, caso queira o resultado, digite o simbolo de '=', caso queira calcular em cima do resultado da operacao realizada, digite novamente mais um operador seguido de mais um numero\n");
-    printf("caso queira utilizar um numero irracional (pi ou euler), ao inves de digitar um operador, digite 'p' para pi ou 'e' para euler, e depois digite a operação juntamente com o segundo numero (caso seja uma operação que necessite) novamente \n\n");
+    mostrar_menu_calculadora();
 
     scanf("%f", &n1);
     scanf(" %c", &op);
     res=n1;
+    sprintf(exp, "%.6f", n1);
 
     while (op!='='){
+        
         if(op == 'h' || op == 'H') {
             mostrar_hist();
             printf("\nDigite a proxima operacao (ou = para sair): ");
@@ -138,32 +181,25 @@ void calculadora_cientifica() {
             printf("\nDigite a proxima operacao (ou = para sair): ");
             scanf(" %c", &op);
             continue;
-        } else if(op=='p'){
-            res=3.141592;
-            strcpy(exp, "π");
-            scanf(" %c", &op);
-        } else if(op=='e'){
-            res=2.718281;
-            strcpy(exp, "e");
+        } 
+
+        if(op == 'p' || op == 'e') {
+            processar_numero_especial(op, &res, exp);
             scanf(" %c", &op);
         }
+
         if((op!='r')&&(op!='|')&&(op!='!')&&(op!='l')&&(op!='=')){
             scanf("%f", &n2);            
         }
+        
         if(op!='='){
             float temp_res = res;
             res=calcular(op, res, n2);
 
-            if(op == 'r') {
-                sprintf(temp, " sqrt(%.6f)", temp_res);
-            } else if(op == '|') {
-                sprintf(temp, " |%.6f|", temp_res);
-            } else if(op == '!') {
-                sprintf(temp, " %.6f!", temp_res);
-            } else if(op == 'l') {
-                sprintf(temp, " log10(%.6f)", temp_res);
+            if(op == 'r' || op == '|' || op == '!' || op == 'l') {
+                processar_operacao_unaria(op, temp_res, exp, temp);
             } else {
-                sprintf(temp, " %c %.6f", op, n2);
+                processar_operacao_binaria(op, temp_res, n2, exp, temp);
             }
             strcat(exp, temp);
 
@@ -172,6 +208,7 @@ void calculadora_cientifica() {
     }
     printf("\nresultado da operacao: %f\n", res);
     add_hist(exp, res);
+
     printf("\nDeseja ver o historico? (s/n): ");
     char ver_hist;
     scanf(" %c", &ver_hist);
