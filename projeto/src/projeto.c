@@ -34,17 +34,22 @@ int opcao_valida(int op, int max_op);
 
 
 void add_hist(const char* exp, float res) {
+
+    if(exp == NULL) return;
+
+    CalcHist *elemento;
+
     if (tot_calc < MAX_HIST) {
-        strncpy(hist[tot_calc].exp, exp, TAM_EXP - 1);
-        hist[tot_calc].exp[TAM_EXP - 1] = '\0';
-        hist[tot_calc].res = res;
+        elemento = &hist[tot_calc];
         tot_calc++;
     } else {
-        strncpy(hist[idx_hist].exp, exp, TAM_EXP - 1);
-        hist[idx_hist].exp[TAM_EXP - 1] = '\0';
-        hist[idx_hist].res = res;
+        elemento = &hist[idx_hist];
         idx_hist = (idx_hist + 1) % MAX_HIST;
     }
+    
+    strncpy(elemento->exp, exp, TAM_EXP - 1);
+    elemento->exp[TAM_EXP - 1] = '\0';
+    elemento->res = res;
 }
 
 void mostrar_hist() {
