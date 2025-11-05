@@ -83,8 +83,13 @@ void mostrar_hist() {
 }
 
 void limpar_hist() {
-    tot_calc = 0;
-    idx_hist = 0;
+    if (hist != NULL) {
+        free(hist);
+        hist = NULL;
+        tot_calc = 0;
+        capacidade_hist = 0;
+        printf("Memoria do historico liberada!\n");
+    }
     printf("Historico limpo!\n");
 }
 
