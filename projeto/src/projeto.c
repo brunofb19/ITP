@@ -31,6 +31,7 @@ void conversor_massa();
 void conversor_velocidade();
 void mostrar_menu_unidades(const char* titulo, const char* unidades[], int num_unidades);
 int opcao_valida(int op, int max_op);
+int criar_conversor (const char** nomes_unidades, float* fatores, int num_unidades, const char* titulo, float *resultado);
 
 int expandir_historico() {
     int nova_capacidade = (capacidade_hist == 0) ? 10 : capacidade_hist * 2;
@@ -292,21 +293,17 @@ int opcao_valida(int op, int max_op) {
     return (op >= 1 && op <= max_op);
 }
 
+int criar_conversor(const char** nomes_unidades, float* fatores, int num_unidades, const char* titulo, float *resultado) {
 
-void conversor_moedas() {
+    if(nomes_unidades == NULL || fatores == NULL || resultado == NULL) {
+        printf("Erro: Ponteiros invalidos!\n");
+        return 0;
+    }
+    
+    mostrar_menu_unidades(titulo, nomes_unidades, num_unidades);
+    
     int op1, op2;
-    float val, res;
-    
-    const char* unidades[] = {
-        "Dolar Americano (USD)",
-        "Euro (EUR)", 
-        "Real Brasileiro (BRL)",
-        "Libra Esterlina (GBP)",
-        "Iene Japones (JPY)"
-    };
-    int num_unidades = 5;
-    
-    mostrar_menu_unidades("CONVERSOR DE MOEDAS", unidades, num_unidades);
+    float val;
     
     printf("Selecione a unidade de origem: ");
     scanf("%d", &op1);
@@ -317,22 +314,34 @@ void conversor_moedas() {
     
     if(!opcao_valida(op1, num_unidades) || !opcao_valida(op2, num_unidades)) {
         printf("Opcao invalida!\n");
-        return;
+        return 0;
     }
     
-    float taxas[] = {1.0, 0.85, 5.20, 0.73, 110.50};
+    *resultado = val * fatores[op1 - 1] / fatores[op2 - 1];
+    return 1;
+}
+
+void conversor_moedas() {
+    float res;
     
-    float val_usd = val / taxas[op1 - 1];
+    const char* unidades[] = {
+        "Dolar Americano (USD)",
+        "Euro (EUR)", 
+        "Real Brasileiro (BRL)",
+        "Libra Esterlina (GBP)",
+        "Iene Japones (JPY)"
+    };
+
+    float fatores[] = {1.0, 0.85, 5.20, 0.73, 110.50};
+    int num_unidades = 5;
     
-    res = val_usd * taxas[op2 - 1];
-    
-    printf("\nResultado: %.2f %s = %.2f %s\n", 
-           val, unidades[op1 - 1], res, unidades[op2 - 1]);
+    if(criar_conversor(unidades, fatores, num_unidades, "CONVERSOR DE MOEDAS", &res)) {
+        printf("\nResultado: %.2f\n", res);
+    }
 }
 
 void conversor_comprimento() {
-    int op1, op2;
-    float val, res;
+    float res;
     
     const char* unidades[] = {
         "Metro (m)",
@@ -344,254 +353,92 @@ void conversor_comprimento() {
         "Polegada (in)"
     };
     int num_unidades = 7;
+    float fatores[] = {1.0, 0.01, 1000.0, 0.001, 0.3048, 0.9144, 0.0254};
     
-    mostrar_menu_unidades("CONVERSOR DE COMPRIMENTO", unidades, num_unidades);
-    
-    printf("Selecione a unidade de origem: ");
-    scanf("%d", &op1);
-    printf("Selecione a unidade de destino: ");
-    scanf("%d", &op2);
-    printf("Digite o valor: ");
-    scanf("%f", &val);
-    
-    if(!opcao_valida(op1, num_unidades) || !opcao_valida(op2, num_unidades)) {
-        printf("Opcao invalida!\n");
-        return;
+    if(criar_conversor(unidades, fatores, num_unidades, "CONVERSOR DE COMPRIMENTO", &res)) {
+        printf("\nResultado: %.6f\n", res);
     }
-    
-    float para_metro[] = {1.0, 0.01, 1000.0, 0.001, 0.3048, 0.9144, 0.0254};
-    
-    float val_metro = val * para_metro[op1 - 1];
-    
-    res = val_metro / para_metro[op2 - 1];
-    
-    printf("\nResultado: %.6f %s = %.6f %s\n", 
-           val, unidades[op1 - 1], res, unidades[op2 - 1]);
+
 }
 
 void conversor_area() {
-    int op1, op2;
-    float val, res;
+    float res;
     
-    printf("\n=== CONVERSOR DE AREA ===\n");
-    printf("Unidades disponiveis:\n");
-    printf("1 - Metro quadrado (m²)\n");
-    printf("2 - Quilometro quadrado (km²)\n");
-    printf("3 - Centimetro quadrado (cm²)\n");
-    printf("4 - Hectare (ha)\n");
-    printf("5 - Pe quadrado (ft²)\n");
-    printf("6 - Acre (ac)\n");
-    printf("Selecione a unidade de origem: ");
-    scanf("%d", &op1);
-    printf("Selecione a unidade de destino: ");
-    scanf("%d", &op2);
-    printf("Digite o valor: ");
-    scanf("%f", &val);
+    const char* unidades[] = {
+        "Metro quadrado (m²)",
+        "Quilometro quadrado (km²)", 
+        "Centimetro quadrado (cm²)",
+        "Hectare (ha)",
+        "Pe quadrado (ft²)",
+        "Acre (ac)"
+    };
     
-    float val_m2;
-    if(op1 == 1) {
-        val_m2 = val;
-    } else if(op1 == 2) {
-        val_m2 = val * 1000000;
-    } else if(op1 == 3) {
-        val_m2 = val / 10000;
-    } else if(op1 == 4) {
-        val_m2 = val * 10000;
-    } else if(op1 == 5) {
-        val_m2 = val * 0.092903;
-    } else if(op1 == 6) {
-        val_m2 = val * 4046.86;
-    } else {
-        printf("Opcao invalida!\n");
-        return;
+    float fatores[] = {1.0, 1000000.0, 0.0001, 10000.0, 0.092903, 4046.86};
+    int num_unidades = 6;
+
+    if(criar_conversor(unidades, fatores, num_unidades, "CONVERSOR DE AREA", &res)) {
+        printf("\nResultado: %.6f\n", res);
     }
-    
-    if(op2 == 1) {
-        res = val_m2;
-    } else if(op2 == 2) {
-        res = val_m2 / 1000000;
-    } else if(op2 == 3) {
-        res = val_m2 * 10000;
-    } else if(op2 == 4) {
-        res = val_m2 / 10000;
-    } else if(op2 == 5) {
-        res = val_m2 / 0.092903;
-    } else if(op2 == 6) {
-        res = val_m2 / 4046.86;
-    } else {
-        printf("Opcao invalida!\n");
-        return;
-    }
-    
-    printf("\nResultado: %.6f\n", res);
+
 }
 
 void conversor_volume() {
-    int op1, op2;
-    float val, res;
-    
-    printf("\n=== CONVERSOR DE VOLUME ===\n");
-    printf("Unidades disponiveis:\n");
-    printf("1 - Metro cubico (m³)\n");
-    printf("2 - Litro (L)\n");
-    printf("3 - Centimetro cubico (cm³)\n");
-    printf("4 - Mililitro (mL)\n");
-    printf("5 - Galao americano (gal)\n");
-    printf("6 - Onca fluida (fl oz)\n");
-    printf("Selecione a unidade de origem: ");
-    scanf("%d", &op1);
-    printf("Selecione a unidade de destino: ");
-    scanf("%d", &op2);
-    printf("Digite o valor: ");
-    scanf("%f", &val);
-    
-    float val_l;
-    if(op1 == 1) {
-        val_l = val * 1000;
-    } else if(op1 == 2) {
-        val_l = val;
-    } else if(op1 == 3) {
-        val_l = val / 1000;
-    } else if(op1 == 4) {
-        val_l = val / 1000;
-    } else if(op1 == 5) {
-        val_l = val * 3.78541;
-    } else if(op1 == 6) {
-        val_l = val * 0.0295735;
-    } else {
-        printf("Opcao invalida!\n");
-        return;
-    }
-    
+    float res;
 
-    if(op2 == 1) {
-        res = val_l / 1000;
-    } else if(op2 == 2) {
-        res = val_l;
-    } else if(op2 == 3) {
-        res = val_l * 1000;
-    } else if(op2 == 4) {
-        res = val_l * 1000;
-    } else if(op2 == 5) {
-        res = val_l / 3.78541;
-    } else if(op2 == 6) {
-        res = val_l / 0.0295735;
-    } else {
-        printf("Opcao invalida!\n");
-        return;
-    }
+    const char* unidades[] = {
+        "Metro cubico (m³)",
+        "Litro (L)",
+        "Centimetro cubico (cm³)",
+        "Mililitro (mL)",
+        "Galao americano (gal)",
+        "Onca fluida (fl oz)"
+    };
     
-    printf("\nResultado: %.6f\n", res);
+    float fatores[] = {1000.0, 1.0, 0.001, 0.001, 3.78541, 0.0295735};
+    int num_unidades = 6;
+    
+    if(criar_conversor(unidades, fatores, num_unidades, "CONVERSOR DE VOLUME", &res)) {
+        printf("\nResultado: %.6f\n", res);
+    }
 }
 
 void conversor_massa() {
-    int op1, op2;
-    float val, res;
+    float res;
     
-    printf("\n=== CONVERSOR DE MASSA ===\n");
-    printf("Unidades disponiveis:\n");
-    printf("1 - Quilograma (kg)\n");
-    printf("2 - Grama (g)\n");
-    printf("3 - Miligrama (mg)\n");
-    printf("4 - Tonelada (t)\n");
-    printf("5 - Libra (lb)\n");
-    printf("6 - Onca (oz)\n");
-    printf("Selecione a unidade de origem: ");
-    scanf("%d", &op1);
-    printf("Selecione a unidade de destino: ");
-    scanf("%d", &op2);
-    printf("Digite o valor: ");
-    scanf("%f", &val);
+    const char* unidades[] = {
+        "Quilograma (kg)",
+        "Grama (g)",
+        "Miligrama (mg)",
+        "Tonelada (t)",
+        "Libra (lb)",
+        "Onca (oz)"
+    };
     
-
-    float val_kg;
-    if(op1 == 1) {
-        val_kg = val;
-    } else if(op1 == 2) {
-        val_kg = val / 1000;
-    } else if(op1 == 3) {
-        val_kg = val / 1000000;
-    } else if(op1 == 4) {
-        val_kg = val * 1000;
-    } else if(op1 == 5) {
-        val_kg = val * 0.453592;
-    } else if(op1 == 6) {
-        val_kg = val * 0.0283495;
-    } else {
-        printf("Opcao invalida!\n");
-        return;
+    float fatores[] = {1.0, 0.001, 0.000001, 1000.0, 0.453592, 0.0283495};
+    int num_unidades = 6;
+    
+    if(criar_conversor(unidades, fatores, num_unidades, "CONVERSOR DE MASSA", &res)) {
+        printf("\nResultado: %.6f\n", res);
     }
-    
-    if(op2 == 1) {
-        res = val_kg;
-    } else if(op2 == 2) {
-        res = val_kg * 1000;
-    } else if(op2 == 3) {
-        res = val_kg * 1000000;
-    } else if(op2 == 4) {
-        res = val_kg / 1000;
-    } else if(op2 == 5) {
-        res = val_kg / 0.453592;
-    } else if(op2 == 6) {
-        res = val_kg / 0.0283495;
-    } else {
-        printf("Opcao invalida!\n");
-        return;
-    }
-    
-    printf("\nResultado: %.6f\n", res);
 }
 
 void conversor_velocidade() {
-    int op1, op2;
-    float val, res;
+    float res;
     
-    printf("\n=== CONVERSOR DE VELOCIDADE ===\n");
-    printf("Unidades disponiveis:\n");
-    printf("1 - Metro por segundo (m/s)\n");
-    printf("2 - Quilometro por hora (km/h)\n");
-    printf("3 - Milha por hora (mph)\n");
-    printf("4 - Pe por segundo (ft/s)\n");
-    printf("5 - No (kn)\n");
-    printf("Selecione a unidade de origem: ");
-    scanf("%d", &op1);
-    printf("Selecione a unidade de destino: ");
-    scanf("%d", &op2);
-    printf("Digite o valor: ");
-    scanf("%f", &val);
+    const char* unidades[] = {
+        "Metro por segundo (m/s)",
+        "Quilometro por hora (km/h)",
+        "Milha por hora (mph)",
+        "Pe por segundo (ft/s)",
+        "No (kn)"
+    };
     
-    float val_ms;
-    if(op1 == 1) {
-        val_ms = val;
-    } else if(op1 == 2) {
-        val_ms = val / 3.6;
-    } else if(op1 == 3) {
-        val_ms = val * 0.44704;
-    } else if(op1 == 4) {
-        val_ms = val * 0.3048;
-    } else if(op1 == 5) {
-        val_ms = val * 0.514444;
-    } else {
-        printf("Opcao invalida!\n");
-        return;
+    float fatores[] = {1.0, 1.0/3.6, 0.44704, 0.3048, 0.514444};
+    int num_unidades = 5;
+    
+    if(criar_conversor(unidades, fatores, num_unidades, "CONVERSOR DE VELOCIDADE", &res)) {
+        printf("\nResultado: %.6f\n", res);
     }
-    
-    if(op2 == 1) {
-        res = val_ms;
-    } else if(op2 == 2) {
-        res = val_ms * 3.6;
-    } else if(op2 == 3) {
-        res = val_ms / 0.44704;
-    } else if(op2 == 4) {
-        res = val_ms / 0.3048;
-    } else if(op2 == 5) {
-        res = val_ms / 0.514444;
-    } else {
-        printf("Opcao invalida!\n");
-        return;
-    }
-    
-    printf("\nResultado: %.6f\n", res);
 }
 
 
