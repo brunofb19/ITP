@@ -11,9 +11,9 @@ typedef struct {
     float res;
 } CalcHist;
 
-CalcHist hist[MAX_HIST];
+CalcHist *hist = NULL;
 int tot_calc = 0;
-int idx_hist = 0;
+int capacidade_hist = 0;
 
 float calcular(char si, float a, float b);
 void calculadora_cientifica();
@@ -32,24 +32,37 @@ void conversor_velocidade();
 void mostrar_menu_unidades(const char* titulo, const char* unidades[], int num_unidades);
 int opcao_valida(int op, int max_op);
 
+int expandir_historico() {
+    int nova_capacidade = (capacidade_hist == 0) ? 10 : capacidade_hist * 2;
+
+    CalcHist *novo_hist = (CalcHist*)realloc(hist, nova_capacidade * sizeof(CalcHist));
+    
+    if (novo_hist == NULL) {
+        printf("Erro: Nao foi possivel alocar memoria para o historico!\n");
+        return 0;
+    }
+    
+    hist = novo_hist;
+    capacidade_hist = nova_capacidade;
+    return 1;
+}
 
 void add_hist(const char* exp, float res) {
 
     if(exp == NULL) return;
 
-    CalcHist *elemento;
 
-    if (tot_calc < MAX_HIST) {
-        elemento = &hist[tot_calc];
-        tot_calc++;
-    } else {
-        elemento = &hist[idx_hist];
-        idx_hist = (idx_hist + 1) % MAX_HIST;
+    if (tot_calc >= capacidade_hist) {
+        if (!expandir_historico()) {
+            return; 
+        }
     }
     
+    CalcHist *elemento = &hist[tot_calc];
     strncpy(elemento->exp, exp, TAM_EXP - 1);
     elemento->exp[TAM_EXP - 1] = '\0';
     elemento->res = res;
+    tot_calc++;
 }
 
 void mostrar_hist() {
